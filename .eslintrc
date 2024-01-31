@@ -1,0 +1,28 @@
+{
+  "root": true,
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "extends": [],
+  "overrides": [
+    {
+      "files": [
+        "./server/**/*.ts"
+      ],
+      "rules": {
+        "no-console": [
+          "error",
+          {
+            "allow": [
+              "info",
+              "warn",
+              "trace",
+              "error"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
