@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import { LecturerFull, TGroup } from '../types';
 dotenv.config({ path: '../../.env', });
 
 export const callApi = async (path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', body?: string) => {
@@ -20,8 +21,8 @@ export const callApi = async (path: string, method: 'GET' | 'POST' | 'PUT' | 'DE
     return null
 }
 
-export const GetGroup = async (group_code: string) => { try { return (await callApi(`groups/?group_code=${group_code}`, 'GET'))?.groups?.[0] } catch (e) { console.error(e) } return null }
-export const Groups = async (faculty?: string) => { try { return await callApi(`groups${faculty ? `?faculty=${faculty}` : ''}`, 'GET') } catch (e) { console.error(e) } return null }
+export const GetGroup = async (group_code: string) => { try { return (await callApi(`groups/?group_code=${group_code}`, 'GET'))?.groups?.[0] as TGroup } catch (e) { console.error(e) } return null }
+export const Groups = async (faculty?: string) => { try { return (await callApi(`groups${faculty ? `?faculty=${faculty}` : ''}`, 'GET')).groups as TGroup[] } catch (e) { console.error(e) } return null }
 
 export const GetFaculty = async (faculty: string) => {
     try {
@@ -41,7 +42,7 @@ export const GetFaculty = async (faculty: string) => {
 
 export const Lecturers = async () => {
     try {
-        return (await callApi(`lecturers`, 'GET'))?.users as { code: string, name: string, surname: string, patronymic: string }[]
+        return (await callApi(`lecturers`, 'GET'))?.users as LecturerFull[]
     } catch (e) { console.error(e) }
     return []
 }

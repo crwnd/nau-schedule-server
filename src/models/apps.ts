@@ -1,19 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-
-export type tokenObj = {
-    code: string,
-    issued: number,
-    flags: Array<string>,
-    active: boolean
-};
-
-export type TApp = {
-    code: string,
-    name: string,
-    icon: string | undefined,
-    owner: string | undefined,
-    tokens: Array<tokenObj>
-};
+import { TApp } from "../types";
 
 export interface IApp extends TApp, Document { }
 

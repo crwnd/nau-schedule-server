@@ -28,7 +28,7 @@ export function getweek_number(date: Date): number {
     return weekIndex + 1;
 }
 
-export function normalize(arr: Array<any>): Array<OutputDayObject> {
+export function normalize(arr: Array<any>): Array<OutputDayObject & { lecturers: string[] }> {
     return arr.map(el =>
     ({
         code: el.code,
@@ -82,7 +82,7 @@ export async function getDayLessons(groupObj: TSchedule, specialityTemplates: Ar
 
     let requestedDayOfweek_number = countday_number(reqDay, reqMonth, reqYear);
     if (requestedDayOfweek_number == 0) requestedDayOfweek_number = 7;
-    let requestedDayLessons: Array<OutputDayObject> = [];
+    let requestedDayLessons: Array<Omit<OutputDayObject, 'lecturers'> & { lecturers?: string[] }> = [];
 
 
     if (!excludePermanent)
@@ -94,7 +94,7 @@ export async function getDayLessons(groupObj: TSchedule, specialityTemplates: Ar
                     new Date((new Date(element.start_date[0], element.start_date[1] - 1, element.start_date[2])).valueOf() - nowThere.getTimezoneOffset() * 60 * 1000) <= requestedDay &&
                     new Date((new Date(element.end_date[0], element.end_date[1] - 1, element.end_date[2])).valueOf() - nowThere.getTimezoneOffset() * 60 * 1000) >= requestedDay
                 ).map(lesson => {
-                    console.log('lesson', lesson);
+                    // console.log('lesson', lesson);
                     return Object.assign(
                         {},
                         !lesson.template
@@ -111,7 +111,7 @@ export async function getDayLessons(groupObj: TSchedule, specialityTemplates: Ar
                 }
                 )
             ));
-    console.log('requestedDayLessons', requestedDayLessons);
+    // console.log('requestedDayLessons', requestedDayLessons);
     if (!excludeOnetime)
         // requestedDayLessons.push(...
         //     normalize(groupObj.onetimes.add.filter(el => el.date[0] == requestedDay.getFullYear() && el.date[1] == requestedDay.getMonth() + 1 && el.date[2] == requestedDay.getDate())
@@ -175,12 +175,14 @@ export async function getDayLessons(groupObj: TSchedule, specialityTemplates: Ar
     // });
 
     const lecturers = await Users.find({ code: { $in: requestedDayLessons.map(el => el.lecturers).flat() } }).select({ code: 1, name: 1, surname: 1, patronymic: 1, _id: 0 });
-    requestedDayLessons = requestedDayLessons.map(el => Object.assign({}, el, { lecturers: lecturers.filter(lecturer => (el.lecturers || []).some(el => el === lecturer.code)) }));
+    let outputRequestedDayLessons: Array<OutputDayObject> = requestedDayLessons.map(el => Object.assign({}, el, {
+        lecturers: lecturers.filter(lecturer => (el.lecturers || []).some(el => el === lecturer.code)).map(e => e.toObject())
+    }));
 
     if (!showPlace)
-        requestedDayLessons = requestedDayLessons.map(el => Object.assign({}, el, { places: [] }));
+        outputRequestedDayLessons = outputRequestedDayLessons.map(el => Object.assign({}, el, { places: [] }));
 
-    requestedDayLessons = requestedDayLessons.sort(
+    outputRequestedDayLessons = outputRequestedDayLessons.sort(
         (a, b) => {
             if (a.time < b.time) {
                 return -1;
@@ -191,7 +193,7 @@ export async function getDayLessons(groupObj: TSchedule, specialityTemplates: Ar
         }
     );
 
-    return requestedDayLessons;
+    return outputRequestedDayLessons;
 }
 
 export function daysInMonth(m: number, y: number): number {

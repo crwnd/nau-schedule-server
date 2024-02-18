@@ -1,11 +1,15 @@
 import { Request } from "express";
 import { z } from "zod";
 
-export const DateTupleSchema = z.preprocess((a) => typeof a === "string" ? JSON.parse(a) : a, z.tuple([z.number().gte(2020).lte(2100), z.number().gte(1).lte(12), z.number().gte(1).lte(31)]))
+export const TelegramId = z.preprocess((a) => BigInt(a as string), z.bigint())
+export const MonthDaySchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(31))
+export const MonthNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(12))
+export const YearNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(2020).lte(2100))
+export const DateTupleSchema = z.preprocess((a) => typeof a === "string" ? JSON.parse(a) : a, z.tuple([YearNumberSchema, MonthNumberSchema, MonthDaySchema]))
 export const LessonDayNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(7))
+export const LessonWeekNumberNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(2))
 export const LessonWeekNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(53))
 export const LessonMonthNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(1).lte(12))
-export const LessonYearNumberSchema = z.preprocess((a) => parseInt(a as string, 10), z.number().gte(2020).lte(2100))
 export const LessonTimeSchema = z.number().gte(0).lte(1440)
 export const SubgroupSchema = z.number().gte(0).lte(2)
 export const LessonLocationSchema = z.enum([
@@ -37,18 +41,18 @@ export const LecturerShortSchema = z.object({
 export type LecturerShort = z.infer<typeof LecturerShortSchema>;
 export const LecturerFullSchema = z.object({
     code: z.string(),
-    lastname: z.string(),
-    firstname: z.string(),
+    surname: z.string(),
+    name: z.string(),
     patronymic: z.string(),
-    email: z.string(),
-    phone: z.string().optional()
+    email: z.string().nullish(),
+    phone: z.string().nullish()
 });
 export type LecturerFull = z.infer<typeof LecturerFullSchema>;
 export const OutputDayObjectSchema = z.object({
     code: z.string(),
     used_template: z.string().optional(),
     subgroup: SubgroupSchema,
-    lecturers: z.array(z.string()),
+    lecturers: z.array(LecturerShortSchema),
     names: z.array(z.string()),
     comment: z.string(),
     time: LessonTimeSchema,
@@ -73,6 +77,7 @@ export const LessonTemplateSchema = z.object({
 });
 export type LessonTemplate = z.infer<typeof LessonTemplateSchema>;
 export const LessonSchema = z.object({
+    code: z.string().optional(),
     day_number: LessonDayNumberSchema,
     week_number: LessonWeekNumberSchema,
     template: z.string().nullish(),
@@ -81,13 +86,12 @@ export const LessonSchema = z.object({
     names: z.array(z.string()).optional(),
     comment: z.string().optional(),
     time: LessonTimeSchema,
-    duration: LessonTimeSchema,
+    duration: LessonTimeSchema.optional(),
     places: LessonPlaceSchema.nullish(),
     lesson_type: z.string().nullish(),
-    recordings: z.array(z.string()),
+    recordings: z.array(z.string()).nullish(),
     start_date: DateTupleSchema,
     end_date: DateTupleSchema,
-    code: z.string().optional(),
     canceled: z.boolean().optional(),
     created_by: CreatedBySchema.nullish()
 });
@@ -147,6 +151,21 @@ export const LessonChangeInputSchema = z.object({
 });
 export type LessonChangeInput = z.infer<typeof LessonChangeInputSchema>;
 
+export const AppTokenSchema = z.object({
+    code: z.string(),
+    issued: z.number(),
+    flags: z.array(z.string()),
+    active: z.boolean()
+});
+export type TAppToken = z.infer<typeof AppTokenSchema>;
+export const AppSchema = z.object({
+    code: z.string(),
+    name: z.string(),
+    icon: z.string().optional(),
+    owner: z.string().optional(),
+    tokens: z.array(AppTokenSchema)
+});
+export type TApp = z.infer<typeof AppSchema>;
 export const UserSchema = z.object({
     iss: z.string(),
     sub: z.string(),
@@ -158,5 +177,17 @@ export const UserSchema = z.object({
     permissions: z.array(z.string())
 });
 export type TUser = z.infer<typeof UserSchema>;
+
+export const GroupSchema = z.object({
+    code: z.string(),
+    names: z.array(z.string()),
+    desc: z.string(),
+    owner: z.string().optional(),
+    faculty: z.string(),
+    speciality: z.string(),
+    has_second_subgroup: z.boolean(),
+    is_deleted: z.boolean().optional()
+})
+export type TGroup = z.infer<typeof GroupSchema>;
 
 export interface AuthedRequest extends Request { User?: TUser; }
