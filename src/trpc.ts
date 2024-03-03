@@ -6,6 +6,9 @@ import * as jose from 'jose';
 import { type TApp, type TUser } from './types.js';
 import Apps from './models/apps.js';
 
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env', });
+
 console.log('connecting to mongodb...');
 mongoose.set('debug', true);
 mongoose.set('strictQuery', true);

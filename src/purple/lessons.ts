@@ -55,18 +55,15 @@ export const lessonsRouter = router({
             const Speciality = await Specialities.findOne({ code: Group.speciality })
             if (!Speciality) throw "speciality not found"
 
-            if (!lessonObjForDB.template || resolveTemplate(lessonObjForDB.template, Schedule!.lesson_templates, Speciality.lesson_templates || []))
-                lessonObjForDB.template = undefined
+            if (lessonObjForDB.template)
+                if(!resolveTemplate(lessonObjForDB.template, Schedule.lesson_templates, Speciality.lesson_templates || []))
+                    throw `template ${lessonObjForDB.template} not found`
 
             console.log('lesson for db', lessonObjForDB)
 
             if (Array.isArray(lessonObjForDB.lecturers) && lessonObjForDB.lecturers.length > 0) {
                 const lecturers = await Users.find({ code: { $in: lessonObjForDB.lecturers } })
                 if (lecturers.length !== lessonObjForDB.lecturers.length) throw `${lessonObjForDB.lecturers.find(l => !lecturers.some(le => le.code === l))} not found`
-            }
-            if (lessonObjForDB.template) {
-                const template = Speciality.lesson_templates?.find(t => t.id === lessonObjForDB.template)
-                if (!template) throw `template ${lessonObjForDB.template} not found`
             }
 
             const lesson = { ...lessonObjForDB, code: hexoid(16)() }
@@ -86,16 +83,13 @@ export const lessonsRouter = router({
             const Speciality = await Specialities.findOne({ code: Group.speciality })
             if (!Speciality) throw "speciality not found"
 
-            if (!lessonObjForDB.template || resolveTemplate(lessonObjForDB.template, Schedule!.lesson_templates, Speciality.lesson_templates || []))
-                lessonObjForDB.template = undefined
+            if (lessonObjForDB.template)
+                if(!resolveTemplate(lessonObjForDB.template, Schedule.lesson_templates, Speciality.lesson_templates || []))
+                    throw `template ${lessonObjForDB.template} not found`
 
             if (Array.isArray(lessonObjForDB.lecturers) && lessonObjForDB.lecturers.length > 0) {
                 const lecturers = await Users.find({ code: { $in: lessonObjForDB.lecturers } })
                 if (lecturers.length !== lessonObjForDB.lecturers.length) throw `${lessonObjForDB.lecturers.find(l => !lecturers.some(le => le.code === l))} not found`
-            }
-            if (lessonObjForDB.template) {
-                const template = Speciality.lesson_templates?.find(t => t.id === lessonObjForDB.template)
-                if (!template) throw `template ${lessonObjForDB.template} not found`
             }
 
             await Schedule.updateOne({

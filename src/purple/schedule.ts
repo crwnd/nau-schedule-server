@@ -238,6 +238,7 @@ export const scheduleRouter = router({
                         ),
                 });
             }
+            
             return {
                 days: days,
                 week_number: countweek_number(new Date(first_day_of_the_week.valueOf() - nowThere.getTimezoneOffset() * 60 * 1000), Schedule.week_syncs)

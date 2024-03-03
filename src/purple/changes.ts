@@ -50,7 +50,7 @@ export const changesRouter = router({
             const Speciality = await Specialities.findOne({ code: Group.speciality });
             if (!Speciality) throw "speciality not found";
 
-            if (!lessonObjForDB.template || resolveTemplate(lessonObjForDB.template, Schedule!.lesson_templates, Speciality.lesson_templates || []))
+            if (!lessonObjForDB.template || !resolveTemplate(lessonObjForDB.template, Schedule!.lesson_templates, Speciality.lesson_templates || []))
                 lessonObjForDB.template = undefined
 
             const change = { ...lessonObjForDB, code: hexoid(16)() }
@@ -71,8 +71,9 @@ export const changesRouter = router({
             const Speciality = await Specialities.findOne({ code: Group.speciality });
             if (!Speciality) throw "speciality not found"
 
-            if (!change.template || resolveTemplate(change.template, Schedule!.lesson_templates, Speciality.lesson_templates || []))
-                change.template = undefined
+            if (change.template)
+                if(!resolveTemplate(change.template, Schedule.lesson_templates, Speciality.lesson_templates || []))
+                    throw `template ${change.template} not found`
 
             await Schedule.updateOne(
                 {

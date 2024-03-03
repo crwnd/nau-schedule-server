@@ -3,11 +3,11 @@ import Users from '../models/users.js';
 import { GetLecturers } from '../services/nau_api.js';
 import { LessonBase, LessonChange, LessonTemplate, OutputDayObject } from '../types.js';
 
-export function resolveTemplate(inputName: string, groupTemplates: Array<LessonTemplate>, facultyTemplates: Array<LessonTemplate>): LessonTemplate | undefined {
+export function resolveTemplate(inputName: string, groupTemplates?: Array<LessonTemplate>, facultyTemplates?: Array<LessonTemplate>): LessonTemplate | undefined {
     if (inputName.startsWith("-")) {
-        return facultyTemplates.find(el => el.id == inputName.slice(1));
+        return facultyTemplates?.find(el => el.id === inputName.substring(1));
     }
-    return groupTemplates.find(el => el.id == inputName);
+    return groupTemplates?.find(el => el.id == inputName);
 }
 export function getweek_number(date: Date): number {
     // Copy the date object to avoid modifying the original

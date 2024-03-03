@@ -17,7 +17,6 @@ export const templatesRouter = router({
             const Speciality = await Specialities.findOne({ code: speciality });
             if (!Speciality) throw "speciality not found"
 
-            console.log(Speciality.lesson_templates)
             z.array(LessonTemplateSchema).parse(Speciality.lesson_templates)
 
             return Speciality.lesson_templates

@@ -57,7 +57,7 @@ export const OutputDayObjectSchema = z.object({
     comment: z.string(),
     time: LessonTimeSchema,
     duration: z.number(),
-    places: LessonPlaceSchema,
+    places: LessonPlaceSchema.nullable(),
     canceled: z.boolean(),
     lesson_type: z.string(),
     recordings: z.array(z.string()),
