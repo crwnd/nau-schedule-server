@@ -37,7 +37,7 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
     title: 'NAU Schedule API',
     description: 'TODO: add descriptionn<br>Purple - schedule v2',
     version: '0.0.1',
-    baseUrl: process.env.BASE_URL || 'http://localhost:3256',
-    // docsUrl: 'https://github.com/jlalmes/trpc-openapi',
+    baseUrl: process.env.BASE_URL || 'https://schedule.crwnd.dev/api/',
+    docsUrl: 'https://github.com/crwnd/nau-schedule-server',
     tags: ['apps', 'groups', 'specialities', 'users', 'purple/schedule', 'purple/lessons', 'purple/changes', 'purple/week-syncs'],
 });
